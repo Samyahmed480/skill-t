@@ -1,0 +1,9 @@
+{
+  "bot_token": "",
+  "allowed_chat_ids": [],
+  "bot_username": "",
+  "bot_name": "",
+  "server_port": 8765,
+  "auto_start_bot": false,
+  "safe_mode": true
+}

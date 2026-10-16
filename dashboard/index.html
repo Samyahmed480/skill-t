@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antigravity ✕ Telegram Bridge | لوحة التحكم والربط</title>
+  <meta name="description" content="لوحة تحكم وربط سكيل Antigravity مع بوت تيليجرام للتحكم عن بعد وتلقي الإشعارات الفورية">
+  
+  <!-- Google Fonts: Cairo & Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-3"></div>
+
+  <div class="app-layout">
+    <!-- Top Navigation Header -->
+    <header class="main-header glass-card">
+      <div class="brand-section">
+        <div class="brand-logo">
+          <span class="logo-icon">⚡</span>
+          <span class="logo-pulse"></span>
+        </div>
+        <div class="brand-text">
+          <h1>Antigravity <span>Telegram Bridge</span></h1>
+          <p class="subtitle">لوحة التحكم، الربط، وإدارة السكيل الذكي</p>
+        </div>
+      </div>
+
+      <!-- Quick System Status Badge -->
+      <div class="header-status-group">
+        <div class="status-indicator-badge" id="botStatusPill">
+          <span class="status-dot dot-inactive" id="botStatusDot"></span>
+          <span class="status-text" id="botStatusLabel">جاري الفحص...</span>
+        </div>
+
+        <button class="btn btn-primary" id="btnToggleBot" onclick="toggleBotState()">
+          <span class="btn-icon">▶️</span>
+          <span id="btnToggleBotText">تشغيل البوت</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Grid Content -->
+    <main class="dashboard-grid">
+      <!-- Left Column: Settings, Skills, and Controller -->
+      <div class="grid-column">
+        
+        <!-- CARD 1: Bot Connection & Authorization -->
+        <section class="card glass-card" id="cardConnection">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <span class="card-badge">01</span>
+              <h2>ربط بوت تيليجرام <span>(Bot Authentication)</span></h2>
+            </div>
+            <span class="help-tooltip" title="احصل على التوكن من @BotFather">ℹ️ مساعدة</span>
+          </div>
+
+          <div class="card-body">
+            <!-- Bot Token Field -->
+            <div class="form-group">
+              <label for="inputBotToken">
+                رمز البوت (Bot Token)
+                <a href="https://t.me/BotFather" target="_blank" class="link-external">إنشاء بوت عبر @BotFather ↗</a>
+              </label>
+              <div class="input-with-button">
+                <input type="password" id="inputBotToken" placeholder="123456789:ABCdefGhIJKlmNoPQRstuVWXyz" autocomplete="off">
+                <button type="button" class="btn-action-icon" id="btnToggleTokenVisibility" onclick="toggleTokenMask()" title="إظهار / إخفاء">👁</button>
+                <button type="button" class="btn btn-secondary" id="btnVerifyToken" onclick="verifyBotToken()">
+                  <span>🔍 فحص</span>
+                </button>
+              </div>
+              <p class="input-hint" id="tokenVerifyResult"></p>
+            </div>
+
+            <!-- Connected Bot Info Banner (Dynamic) -->
+            <div class="bot-info-box hidden" id="botInfoBox">
+              <div class="bot-avatar">🤖</div>
+              <div class="bot-meta">
+                <h4 id="infoBotName">اسم البوت</h4>
+                <p>@<span id="infoBotUsername">username</span> &bull; ID: <code id="infoBotId">000000</code></p>
+              </div>
+              <a href="#" target="_blank" class="btn-sm btn-outline" id="linkOpenTelegram">محادثة البوت ↗</a>
+            </div>
+
+            <!-- Allowed User IDs -->
+            <div class="form-group mt-3">
+              <label for="inputAllowedUsers">
+                معرّفات المتحكمين المعتمدين (Allowed Chat / User IDs)
+                <span class="label-desc">الآيدي المسموح له بإرسال أوامر التحكم وتلقي الإشعارات</span>
+              </label>
+              <div class="input-with-button">
+                <input type="text" id="inputAllowedUsers" placeholder="مثال: 123456789, 987654321">
+                <button type="button" class="btn btn-secondary" id="btnDetectId" onclick="detectRecentChatIds()" title="اكتشاف من راسل البوت مؤخراً">
+                  <span>⚡ اكتشاف تلقائي</span>
+                </button>
+              </div>
+              <div class="detected-users-container hidden" id="detectedUsersList"></div>
+            </div>
+
+            <!-- Security Safe Mode Toggle -->
+            <div class="toggle-group mt-2">
+              <div class="toggle-info">
+                <strong>الوضع الآمن (Safe Mode)</strong>
+                <span>حظر الأوامر الخطرة ومطالبة التأكيد قبل الحذف أو التعديل</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="checkSafeMode" checked>
+                <span class="slider round"></span>
+              </label>
+            </div>
+
+            <!-- Save Action Button -->
+            <div class="action-footer">
+              <button class="btn btn-gradient" id="btnSaveConfig" onclick="saveConfiguration()">
+                <span>💾 حفظ الإعدادات</span>
+              </button>
+              <span class="save-status-msg" id="saveStatusMsg"></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- CARD 2: Antigravity Skill Sync & Status -->
+        <section class="card glass-card" id="cardSkill">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <span class="card-badge">02</span>
+              <h2>حالة سكيل Antigravity <span>(Skill Status & Sync)</span></h2>
+            </div>
+            <button class="btn-sm btn-secondary" onclick="syncSkills()" title="مزامنة وتحديث السكيل">🔄 مزامنة الاثنين</button>
+          </div>
+
+          <div class="card-body">
+            <p class="section-desc">
+              تم تثبيت وتفعيل السكيل في كلا الموضعين ليعمل معك داخل هذا المشروع وفي أي مشروع عام لـ Antigravity:
+            </p>
+
+            <div class="skill-status-grid">
+              <div class="skill-item-box" id="boxGlobalSkill">
+                <div class="skill-icon">🌐</div>
+                <div class="skill-info">
+                  <strong>السكيل العام (Global Antigravity)</strong>
+                  <code>~/.gemini/config/skills/telegram-control</code>
+                </div>
+                <span class="badge badge-success" id="badgeGlobalSkill">مثبت وفعّال</span>
+              </div>
+
+              <div class="skill-item-box" id="boxWorkspaceSkill">
+                <div class="skill-icon">📁</div>
+                <div class="skill-info">
+                  <strong>سكيل المشروع الحالي (Workspace Local)</strong>
+                  <code>.agents/skills/telegram-control</code>
+                </div>
+                <span class="badge badge-success" id="badgeWorkspaceSkill">مثبت وفعّال</span>
+              </div>
+            </div>
+
+            <div class="cli-quick-help">
+              <div class="cli-title">أدوات السكيل المتاحة للاستدعاء عبر سطر الأوامر أو الوكيل:</div>
+              <div class="command-pill-list">
+                <span class="code-pill" onclick="copySnippet('python scripts/send_notification.py --message \'Task complete\' --level \'success\'')">
+                  📨 send_notification.py 📋
+                </span>
+                <span class="code-pill" onclick="copySnippet('python scripts/wait_for_approval.py --prompt \'Confirm deploy?\' --timeout 60')">
+                  🔐 wait_for_approval.py 📋
+                </span>
+                <span class="code-pill" onclick="copySnippet('python scripts/bot_daemon.py')">
+                  🤖 bot_daemon.py 📋
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Column: Dispatcher, System Metrics, and Live Console -->
+      <div class="grid-column">
+        
+        <!-- CARD 3: Notification Dispatcher & Interactive Tester -->
+        <section class="card glass-card" id="cardDispatcher">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <span class="card-badge">03</span>
+              <h2>جهاز الإرسال والاختبار <span>(Live Dispatcher & Approval Test)</span></h2>
+            </div>
+            <span class="status-chip">فوري ⚡</span>
+          </div>
+
+          <div class="card-body">
+            <div class="form-group">
+              <label for="inputTestTitle">عنوان الإشعار</label>
+              <input type="text" id="inputTestTitle" value="تنبيه تجريبي من لوحة Antigravity">
+            </div>
+
+            <div class="form-group">
+              <label for="inputTestMessage">نص الرسالة</label>
+              <textarea id="inputTestMessage" rows="2" placeholder="اكتب رسالة تجريبية لتصل إلى تليجرام فوراً...">تم الاتصال بنجاح بين Antigravity وتيليجرام! كل الأنظمة جاهزة.</textarea>
+            </div>
+
+            <div class="flex-row-gap">
+              <div class="form-group flex-1">
+                <label for="selectTestLevel">مستوى التنبيه</label>
+                <select id="selectTestLevel">
+                  <option value="success">✅ نجاح (Success)</option>
+                  <option value="info" selected>ℹ️ معلومات (Info)</option>
+                  <option value="warning">⚠️ تحذير (Warning)</option>
+                  <option value="error">🚨 خطأ (Error)</option>
+                </select>
+              </div>
+
+              <div class="button-actions-horizontal">
+                <button class="btn btn-primary" id="btnSendTest" onclick="sendTestNotification()">
+                  <span>🚀 إرسال للتليجرام</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CARD 4: Live Activity Console & System Monitor -->
+        <section class="card glass-card terminal-card" id="cardConsole">
+          <div class="card-header terminal-header">
+            <div class="terminal-dots">
+              <span class="dot-red"></span>
+              <span class="dot-yellow"></span>
+              <span class="dot-green"></span>
+            </div>
+            <div class="terminal-title">سجل النشاط والأوامر الحية (Live Daemon Terminal)</div>
+            <div class="terminal-actions">
+              <button class="btn-terminal" onclick="fetchLogs()" title="تحديث السجلات">🔄</button>
+              <button class="btn-terminal" onclick="clearLocalLogsView()" title="مسح الشاشة">🗑</button>
+            </div>
+          </div>
+
+          <div class="terminal-body" id="terminalOutput">
+            <div class="term-line info">[System] جاري الاتصال بالسيرفر وجلب السجلات...</div>
+          </div>
+
+          <div class="terminal-footer">
+            <div class="sys-stat-item">
+              <span class="stat-label">المضيف:</span>
+              <span class="stat-val" id="statHost">Localhost</span>
+            </div>
+            <div class="sys-stat-item">
+              <span class="stat-label">بايثون:</span>
+              <span class="stat-val" id="statPython">3.14</span>
+            </div>
+            <div class="sys-stat-item">
+              <span class="stat-label">المساحة المتاحة:</span>
+              <span class="stat-val" id="statDisk">-- GB</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Floating Toast Notification -->
+    <div class="toast-notification" id="toastNotification">
+      <span class="toast-icon" id="toastIcon">ℹ️</span>
+      <span class="toast-message" id="toastMessage">رسالة إشعار</span>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
